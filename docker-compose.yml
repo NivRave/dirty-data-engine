@@ -1,0 +1,24 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  dirty-data-engine:
+    build: .
+    ports:
+      - "18081:18081"
+    environment:
+      PORT: "18081"
+      RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672/"
+      RABBITMQ_QUEUE: "telemetry_raw"
+      ENGINE_SEED: "dirty-data-engine|workshop|seed|v1"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy

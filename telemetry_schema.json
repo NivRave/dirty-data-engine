@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/telemetry.dirty.v1.schema.json",
+  "title": "Dirty Telemetry Message",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "sequence",
+    "emitted_at_unix",
+    "source",
+    "payload",
+    "integrity"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "sequence": { "type": "integer" },
+    "emitted_at_unix": { "type": "integer" },
+    "source": {
+      "type": "object",
+      "required": [
+        "system",
+        "facility",
+        "device_class",
+        "device_id",
+        "firmware",
+        "protocol",
+        "protocol_minor"
+      ],
+      "properties": {
+        "system": { "type": "string" },
+        "facility": { "type": "string" },
+        "device_class": { "type": "string" },
+        "device_id": { "type": "string" },
+        "firmware": { "type": "string" },
+        "protocol": { "type": "string" },
+        "protocol_minor": { "type": "integer" }
+      },
+      "additionalProperties": false
+    },
+    "payload": {
+      "type": "object",
+      "required": ["sensors", "noise"],
+      "properties": {
+        "sensors": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sensor" }
+        },
+        "noise": { "$ref": "#/$defs/noise" }
+      },
+      "additionalProperties": false
+    },
+    "integrity": {
+      "type": "object",
+      "required": ["payload_sha256", "signature_b64"],
+      "properties": {
+        "payload_sha256": { "type": "string" },
+        "signature_b64": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "sensor": {
+      "type": "object",
+      "required": [
+        "sensor_id",
+        "sensor_type",
+        "hardware",
+        "calibration",
+        "data",
+        "diagnostics",
+        "raw_wave_chunks"
+      ],
+      "properties": {
+        "sensor_id": { "type": "string" },
+        "sensor_type": { "type": "string" },
+        "hardware": {
+          "type": "object",
+          "required": ["model", "serial", "lot", "manufactured_at"],
+          "properties": {
+            "model": { "type": "string" },
+            "serial": { "type": "string" },
+            "lot": { "type": "string" },
+            "manufactured_at": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "calibration": {
+          "type": "object",
+          "required": ["algorithm", "history"],
+          "properties": {
+            "algorithm": { "type": "string" },
+            "history": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["ts", "kind", "gain", "bias", "note"],
+                "properties": {
+                  "ts": { "type": "integer" },
+                  "kind": { "type": "string" },
+                  "gain": { "type": "number" },
+                  "bias": { "type": "number" },
+                  "note": { "type": "string" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "data": {
+          "type": "object",
+          "required": ["metrics"],
+          "properties": {
+            "metrics": {
+              "type": "object",
+              "required": ["vitals", "other"],
+              "properties": {
+                "vitals": {
+                  "type": "object",
+                  "required": ["heart_rate", "spo2", "bp_systolic"],
+                  "properties": {
+                    "heart_rate": { "type": "integer" },
+                    "spo2": { "type": "integer" },
+                    "bp_systolic": { "type": "integer" }
+                  },
+                  "additionalProperties": false
+                },
+                "other": {
+                  "type": "object",
+                  "required": ["resp_rate", "temp_c", "perfusion_index", "signal_quality"],
+                  "properties": {
+                    "resp_rate": { "type": "integer" },
+                    "temp_c": { "type": "number" },
+                    "perfusion_index": { "type": "number" },
+                    "signal_quality": { "type": "number" }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "diagnostics": {
+          "type": "object",
+          "required": ["health_score", "flags", "hw_logs"],
+          "properties": {
+            "health_score": { "type": "number" },
+            "flags": { "type": "array", "items": { "type": "string" } },
+            "hw_logs": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["ts", "level", "module", "code", "message", "trace_b64"],
+                "properties": {
+                  "ts": { "type": "integer" },
+                  "level": { "type": "string" },
+                  "module": { "type": "string" },
+                  "code": { "type": "string" },
+                  "message": { "type": "string" },
+                  "trace_b64": { "type": "string" }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "raw_wave_chunks": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "noise": {
+      "type": "object",
+      "required": [
+        "encrypted_metadata",
+        "blob_refs",
+        "audit_trail",
+        "noise_matrix",
+        "key_value_junk",
+        "padding"
+      ],
+      "properties": {
+        "encrypted_metadata": { "type": "array", "items": { "type": "string" } },
+        "blob_refs": { "type": "array", "items": { "type": "string" } },
+        "audit_trail": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["ts", "actor", "action", "object_ref", "details"],
+            "properties": {
+              "ts": { "type": "integer" },
+              "actor": { "type": "string" },
+              "action": { "type": "string" },
+              "object_ref": { "type": "string" },
+              "details": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "noise_matrix": {
+          "type": "array",
+          "items": { "type": "array", "items": { "type": "integer" } }
+        },
+        "key_value_junk": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "padding": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}
+
