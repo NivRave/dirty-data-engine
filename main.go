@@ -24,7 +24,7 @@ const (
 	defaultQueue         = "telemetry_raw"
 	defaultRabbitDocker  = "amqp://guest:guest@rabbitmq:5672/"
 	defaultRabbitLocal   = "amqp://guest:guest@localhost:5672/"
-	normalInterval       = 2 * time.Second
+	normalInterval       = 200 * time.Millisecond
 	targetPayloadBytes   = 50 * 1024
 	minStormMessagesPerS = 50
 	maxStormMessagesPerS = 100
